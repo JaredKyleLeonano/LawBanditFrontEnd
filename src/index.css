@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-VariableFont_wght.ttf");
+}
+
+@theme {
+  --font-Georgia: Georgia, "Times New Roman", serif;
+  --font-Geist: "Geist";
+}
