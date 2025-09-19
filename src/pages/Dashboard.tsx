@@ -20,7 +20,7 @@ import {
 import { createClass, getClasses } from "../api/classes";
 import type { Session } from "@supabase/supabase-js";
 import { deleteTokens } from "../api/google";
-import { useClasses } from "../context/classesContext";
+import { useClasses } from "../context/ClassesContext";
 
 function App() {
   const { session, signOut } = useAuth();
@@ -240,8 +240,8 @@ function App() {
                 <hr className="text-[#e7e3e0]"></hr>
                 <li
                   onClick={async () => {
-                    if (session.user.app_metadata.provider! == "google") {
-                      await deleteTokens(session.user.id, session);
+                    if (session!.user.app_metadata.provider! == "google") {
+                      await deleteTokens(session!.user.id, session);
                     }
                     signOut();
                   }}
