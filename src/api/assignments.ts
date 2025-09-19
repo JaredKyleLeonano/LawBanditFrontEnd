@@ -1,6 +1,6 @@
 import type { Session } from "@supabase/supabase-js";
-import axios from "axios";
 import type { AssignmentType } from "../types";
+import { api } from "./api";
 
 const formatAssignmentSchedule = (assignments: AssignmentType[]) => {
   return assignments.map((assignment) => ({
@@ -16,12 +16,11 @@ const formatAssignmentSchedule = (assignments: AssignmentType[]) => {
 
 export const getAssignments = async (session: Session | null) => {
   try {
-    const response = await axios.get("http://localhost:4000/getAssignments", {
+    const response = await api.get("/getAssignments", {
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
       },
     });
-    console.log("Response from getAssignments:", response.data);
     const assignmentSchedule = formatAssignmentSchedule(response.data);
     return assignmentSchedule;
   } catch (err) {
@@ -40,8 +39,8 @@ export const createAssignment = async (
   session: Session | null
 ) => {
   try {
-    const response = await axios.post(
-      "http://localhost:4000/createAssignment",
+    const response = await api.post(
+      "/createAssignment",
       { calendar_id, user_id, syllabus_id, title, subtitle, start, end },
       {
         headers: {
@@ -68,8 +67,8 @@ export const updateAssignment = async (
   session: Session | null
 ) => {
   try {
-    const response = await axios.put(
-      `http://localhost:4000/updateAssignment/${assignment_id}`,
+    const response = await api.put(
+      `/updateAssignment/${assignment_id}`,
       { event_id, calendar_id, user_id, title, subtitle, start, end },
       {
         headers: {
@@ -92,21 +91,18 @@ export const deleteAssignment = async (
   session: Session | null
 ) => {
   try {
-    const response = await axios.delete(
-      `http://localhost:4000/deleteAssignment/${assignment_id}`,
-      {
-        data: {
-          event_id,
-          calendar_id,
-          user_id,
-        },
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-      }
-    );
+    const response = await api.delete(`/deleteAssignment/${assignment_id}`, {
+      data: {
+        event_id,
+        calendar_id,
+        user_id,
+      },
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    });
     return response.data;
   } catch (err) {
-    console.log("Error deleting assignment:", err);
+    console.error("Error deleting assignment:", err);
   }
 };

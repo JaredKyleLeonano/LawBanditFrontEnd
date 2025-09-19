@@ -102,8 +102,8 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({
         options: {
           scopes: "https://www.googleapis.com/auth/calendar",
           queryParams: {
-            access_type: "offline", // ask Google to return a refresh token
-            prompt: "consent", // force consent screen so refresh_token is issued
+            access_type: "offline",
+            prompt: "consent",
           },
         },
       });

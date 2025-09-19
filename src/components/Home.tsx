@@ -1,4 +1,4 @@
-import { useClasses } from "../context/classesContext";
+import { useClasses } from "../context/ClassesContext";
 import CalendarSchedule from "./CalendarSchedule";
 import NoteCard from "./NoteCard";
 import { formatDistanceToNowStrict } from "date-fns";

@@ -1,5 +1,5 @@
 import type { Session } from "@supabase/supabase-js";
-import axios from "axios";
+import { api } from "./api";
 
 export const saveTokens = async (
   user_id: string,
@@ -11,8 +11,8 @@ export const saveTokens = async (
   session: Session | null
 ) => {
   try {
-    const response = await axios.post(
-      "http://localhost:4000/saveTokens",
+    const response = await api.post(
+      "/saveTokens",
       {
         user_id,
         provider,
@@ -36,13 +36,9 @@ export const deleteTokens = async (
   session: Session | null
 ) => {
   try {
-    console.log("USER ID", user_id);
-    const response = await axios.delete(
-      `http://localhost:4000/deleteTokens/${user_id}`,
-      {
-        headers: { Authorization: `Bearer ${session?.access_token}` },
-      }
-    );
+    const response = await api.delete(`/deleteTokens/${user_id}`, {
+      headers: { Authorization: `Bearer ${session?.access_token}` },
+    });
     return response.data;
   } catch (err) {
     console.error("Error saving tokens", err);

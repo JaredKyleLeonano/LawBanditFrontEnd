@@ -495,7 +495,6 @@ export default function FullCalendarTasksDisplay({
             );
 
             const calendarId = matchedSyllabus?.calendar_id;
-            console.log("THIS IS THE CALENDAR ID:", calendarId);
 
             await updateAssignment(
               eventId,
@@ -510,8 +509,6 @@ export default function FullCalendarTasksDisplay({
             );
           }}
           dateClick={(arg: DateClickArg) => {
-            console.log("testing date click", arg);
-            console.log("testiNG start date:", arg.date);
             setCurrentStart(formatDate(arg.date));
             setCurrentEnd(formatDate(setToEndOfDay(arg.date)));
             setViewPopup(!viewPopup);

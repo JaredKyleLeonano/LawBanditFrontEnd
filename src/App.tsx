@@ -5,7 +5,7 @@ import AuthSignIn from "./components/AuthSignIn";
 import AuthSignUp from "./components/AuthSignUp";
 import Home from "./components/Home";
 import Classes from "./components/Classes";
-import { ClassesProvider } from "./context/classesContext";
+import { ClassesProvider } from "./context/ClassesContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {

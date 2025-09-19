@@ -17,7 +17,7 @@ import {
 import { useEffect, useState } from "react";
 import { deleteClass, updateClass } from "../api/classes";
 import { useAuth } from "../context/AuthContext";
-import { useClasses } from "../context/classesContext";
+import { useClasses } from "../context/ClassesContext";
 import UploadPdf from "./UploadPdf";
 import NoteCard from "./NoteCard";
 import { formatDistanceToNowStrict } from "date-fns";

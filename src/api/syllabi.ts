@@ -1,21 +1,17 @@
 import type { Session } from "@supabase/supabase-js";
-import axios from "axios";
+import { api } from "./api";
 
 export const uploadSyllabus = async (
   formData: FormData,
   session: Session | null
 ) => {
   try {
-    const response = await axios.post(
-      "http://localhost:4000/uploadSyllabus",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-      }
-    );
+    const response = await api.post("/uploadSyllabus", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    });
     return response.data;
   } catch (err) {
     console.error("Error uploading PDF:", err);
@@ -24,7 +20,7 @@ export const uploadSyllabus = async (
 
 export const getSyllabi = async (session: Session | null) => {
   try {
-    const response = await axios.get("http://localhost:4000/getSyllabi", {
+    const response = await api.get("/getSyllabi", {
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
       },
@@ -43,8 +39,8 @@ export const updateSyllabus = async (
   session: Session | null
 ) => {
   try {
-    const response = await axios.put(
-      `http://localhost:4000/updateSyllabus/${syllabus_id}`,
+    const response = await api.put(
+      `/updateSyllabus/${syllabus_id}`,
       { calendar_id, user_id, syllabus_title: title },
       {
         headers: {
@@ -67,21 +63,18 @@ export const deleteSyllabus = async (
   session: Session | null
 ) => {
   try {
-    const response = await axios.delete(
-      `http://localhost:4000/deleteSyllabus/${syllabus_id}`,
-      {
-        data: {
-          calendar_id,
-          class_id,
-          user_id,
-        },
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-      }
-    );
+    const response = await api.delete(`/deleteSyllabus/${syllabus_id}`, {
+      data: {
+        calendar_id,
+        class_id,
+        user_id,
+      },
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    });
     return response.data;
   } catch (err) {
-    console.log("Error deleting syllabus:", err);
+    console.error("Error deleting syllabus:", err);
   }
 };

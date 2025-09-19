@@ -33,22 +33,18 @@ function App() {
   const { classes, setClasses } = useClasses();
 
   useEffect(() => {
-    if (!session) {
-      console.log("testing");
-    } else {
+    if (session) {
       const retrieveClasses = async (session: Session | null) => {
         try {
-          console.log("SESSION IS:", session?.user.app_metadata.provider);
           const response = await getClasses(session);
           setClasses(response?.data);
         } catch (err) {
           console.error("Error retrieving classes:", err);
         }
       };
-      console.log("THESE ARE THE CLASSES:", classes);
       retrieveClasses(session);
     }
-  }, [session, navigate]);
+  }, [session, navigate, setClasses]);
 
   const settingsToggleAnimation = () => {
     if (showSettings) {
@@ -155,7 +151,6 @@ function App() {
               <li
                 onClick={() => {
                   addClassToggleAnimation();
-                  console.log(showAddClass);
                 }}
               >
                 <FontAwesomeIcon

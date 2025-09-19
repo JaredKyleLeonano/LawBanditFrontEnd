@@ -1,13 +1,13 @@
 import type { Session } from "@supabase/supabase-js";
-import axios from "axios";
+import { api } from "./api";
 
 export const createClass = async (
   title: FormDataEntryValue,
   session: Session | null
 ) => {
   try {
-    const response = await axios.post(
-      "http://localhost:4000/createClass",
+    const response = await api.post(
+      "/createClass",
       { title: title },
       {
         headers: {
@@ -24,7 +24,7 @@ export const createClass = async (
 
 export const getClasses = async (session: Session | null) => {
   try {
-    const response = await axios.get("http://localhost:4000/getClasses", {
+    const response = await api.get("/getClasses", {
       headers: {
         Authorization: `Bearer ${session?.access_token}`,
       },
@@ -41,8 +41,8 @@ export const updateClass = async (
   session: Session | null
 ) => {
   try {
-    const response = await axios.put(
-      `http://localhost:4000/updateClass/${class_id}`,
+    const response = await api.put(
+      `/updateClass/${class_id}`,
       { class_title: title },
       {
         headers: {
@@ -62,16 +62,13 @@ export const deleteClass = async (
   session: Session | null
 ) => {
   try {
-    const response = await axios.delete(
-      `http://localhost:4000/deleteClass/${class_id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-      }
-    );
+    const response = await api.delete(`/deleteClass/${class_id}`, {
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`,
+      },
+    });
     return response.data;
   } catch (err) {
-    console.log("Error deleting class:", err);
+    console.error("Error deleting class:", err);
   }
 };
