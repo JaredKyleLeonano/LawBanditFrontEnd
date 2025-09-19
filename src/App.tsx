@@ -6,27 +6,9 @@ import AuthSignUp from "./components/AuthSignUp";
 import Home from "./components/Home";
 import Classes from "./components/Classes";
 import { ClassesProvider } from "./context/classesContext";
-// import { createClient } from "@supabase/supabase-js";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 function App() {
-  // const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  // const supabaseServiceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_KEY;
-
-  // const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
-
-  // async function deleteSupabaseUser(userId: string) {
-  //   const { data, error } = await supabase.auth.admin.deleteUser(userId);
-
-  //   if (error) {
-  //     console.error("Error deleting user:", error.message);
-  //     return { success: false, error: error.message };
-  //   } else {
-  //     console.log("User deleted successfully:", data);
-  //     return { success: true, data };
-  //   }
-  // }
-  // deleteSupabaseUser("b6aeac33-6eb3-4199-a54c-70ab4f908d00");
-
   return (
     <div className="font-Geist">
       <Routes>
@@ -39,9 +21,11 @@ function App() {
         <Route
           path="/dashboard"
           element={
-            <ClassesProvider>
-              <Dashboard />
-            </ClassesProvider>
+            <ProtectedRoute>
+              <ClassesProvider>
+                <Dashboard />
+              </ClassesProvider>
+            </ProtectedRoute>
           }
         >
           <Route index element={<Navigate to="home" replace />} />

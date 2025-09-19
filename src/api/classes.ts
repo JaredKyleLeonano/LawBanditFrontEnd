@@ -16,7 +16,7 @@ export const createClass = async (
         },
       }
     );
-    console.log("Create class response:", response);
+    return response.data;
   } catch (error) {
     console.error("Error creating class:", error);
   }
@@ -29,7 +29,6 @@ export const getClasses = async (session: Session | null) => {
         Authorization: `Bearer ${session?.access_token}`,
       },
     });
-    console.log("Retrieve class response:", response.data);
     return response;
   } catch (err) {
     console.error("Error retrieving classes:", err);
@@ -52,7 +51,6 @@ export const updateClass = async (
         },
       }
     );
-    console.log("Update class response:", response.data);
     return response.data;
   } catch (err) {
     console.error("Error updating class title:", err);
@@ -72,7 +70,7 @@ export const deleteClass = async (
         },
       }
     );
-    console.log("Delete class response:", response.data);
+    return response.data;
   } catch (err) {
     console.log("Error deleting class:", err);
   }

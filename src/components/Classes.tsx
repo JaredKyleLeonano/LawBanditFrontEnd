@@ -35,7 +35,6 @@ const Classes = () => {
 
   useEffect(() => {
     setTitle(state.cls.title);
-    // console.log("TITLE IS", title);
   }, [state.cls.title]);
 
   const timeStamp = formatDistanceToNowStrict(new Date(state.cls.created_at), {
@@ -119,8 +118,7 @@ const Classes = () => {
               </button>
               <button
                 onClick={async () => {
-                  const response = await deleteClass(state.cls.id, session);
-                  console.log("DELETE RESPONSE FROM FRONTEND:", response);
+                  await deleteClass(state.cls.id, session);
                 }}
                 className="px-4 py-2 bg-[#ef4444] rounded-lg hover:cursor-pointer"
               >
@@ -154,28 +152,21 @@ const Classes = () => {
                   defaultValue={title}
                   onChange={(e) => {
                     setTempTitle(e.target.value);
-                    console.log("UPDATED temp TITLE:", tempTitle);
                   }}
                 />
                 <button
                   onClick={async () => {
                     if (tempTitle != title) {
                       state.cls.title = tempTitle;
-                      console.log("UPDATED TITLE:", title);
                       const response = await updateClass(
                         state.cls.id,
                         tempTitle,
                         session
                       );
-                      console.log("RESPONSE IS:", response[0]);
                       setClasses(
                         classes.map((cls) =>
                           cls.id === state.cls.id ? response[0] : cls
                         )
-                      );
-                      console.log(
-                        "UPDATED CLASS IN FRONTEND RESPONSE IS:",
-                        response
                       );
                     }
 

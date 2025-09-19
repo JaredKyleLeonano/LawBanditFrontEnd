@@ -1,75 +1,57 @@
-import { Scheduler } from "@aldabil/react-scheduler";
 import { useAuth } from "../context/AuthContext";
 import { getSyllabi, updateSyllabus, deleteSyllabus } from "../api/syllabi";
+import { getAssignments } from "../api/assignments";
 import {
-  getAssignments,
-  updateAssignment,
-  deleteAssignment,
-  createAssignment,
-} from "../api/assignments";
-import { useState, useEffect, useRef, useLayoutEffect } from "react";
+  useState,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+  useCallback,
+} from "react";
 import type { Session } from "@supabase/supabase-js";
-import type {
-  CellRenderedProps,
-  EventActions,
-  ProcessedEvent,
-} from "@aldabil/react-scheduler/types";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsis } from "@fortawesome/free-solid-svg-icons";
-
-interface FormattedAssignmentType {
-  event_id: number;
-  syllabus_id: number;
-  title: string;
-  subtitle: string;
-  start: Date;
-  end: Date;
-}
-
-interface SyllabusType {
-  id: number;
-  title: string;
-}
+import FullCalendarTasksDisplay from "./TestingCalendar";
+import {
+  faFloppyDisk,
+  faPenToSquare,
+  faTrashCan,
+} from "@fortawesome/free-regular-svg-icons";
+import type { FormattedAssignmentType, SyllabusType } from "../types";
 
 const CalendarSchedule = () => {
+  const { session } = useAuth();
   const [assignmentSchedule, setAssignmentSchedule] = useState<
     FormattedAssignmentType[]
   >([]);
   const [syllabi, setSyllabi] = useState<SyllabusType[]>([]);
   const [selectedSyllabi, setSelectedSyllabi] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
-  const { session } = useAuth();
-
+  const [editingSyllabus, setEditingSyllabus] = useState<number[]>([]);
+  const [tempSyllabusTitle, setTempSyllabusTitle] = useState("");
+  const [syllabusToDelete, setSyllabusToDelete] = useState<number>();
+  const [showDelete, setShowDelete] = useState(false);
   const calendarContainerRef = useRef<HTMLDivElement | null>(null);
-  const [heightPx, setHeightPx] = useState<number>(477); // sensible fallback
+  const [heightPx, setHeightPx] = useState<number>(477);
 
   useLayoutEffect(() => {
     const el = calendarContainerRef.current;
-    console.log("EL IS:", el);
     if (!el) return;
 
     const measure = () => {
       const h = el.clientHeight;
       if (h > 0) {
-        // only update when we have a real measurement
-        setHeightPx(h - 76 - 48);
-        // console.log('MEASURED:', h);
+        setHeightPx(h);
       }
     };
 
-    console.log("HEIGHT IS:", heightPx);
-
-    // initial measure after browser paints to avoid measuring too early
     const rafId = requestAnimationFrame(measure);
 
-    // watch for size changes from children/layout
     const ro = new ResizeObserver(() => {
-      // use rAF inside observer to batch reads
       requestAnimationFrame(measure);
     });
     ro.observe(el);
 
-    // also re-measure on window resize
     const onResize = () => requestAnimationFrame(measure);
     window.addEventListener("resize", onResize);
 
@@ -78,7 +60,6 @@ const CalendarSchedule = () => {
       window.removeEventListener("resize", onResize);
       cancelAnimationFrame(rafId);
     };
-    // re-run when number of events changes (re-measure after content loads)
   }, [loading]);
 
   const toggleSelectedSyllabi = (syllabi_id: number) => {
@@ -91,96 +72,52 @@ const CalendarSchedule = () => {
     });
   };
 
-  //Update States for viewing
-  const updateAssignmentSchedule = (
-    updatedEvent: FormattedAssignmentType | number,
-    action: string
-  ) => {
-    setAssignmentSchedule((prev) => {
-      if (action === "edit" && typeof updatedEvent != "number") {
-        return prev.map((assignment) =>
-          assignment.event_id === updatedEvent.event_id
-            ? updatedEvent
-            : assignment
-        );
-      }
-      if (action === "delete" && typeof updatedEvent == "number") {
-        return prev.filter((assignment) => assignment.event_id != updatedEvent);
-      }
-      return prev;
-    });
-  };
-
-  const handleOnConfirm = async (
-    event: FormattedAssignmentType,
-    action: EventActions
-  ) => {
-    if (action === "edit") {
-      updateAssignmentSchedule(event, "edit");
-      await updateAssignment(event, session);
-    }
-
-    //FOLLOW UP
-    if (action === "create") {
-      console.log("ACTION IS:", action);
-      await createAssignment(event, session);
-    }
-    return event;
-  };
-
-  const handleOnEventDrop = async (
-    dragEvent: React.DragEvent<HTMLButtonElement>,
-    droppedOn: Date,
-    updatedEvent: FormattedAssignmentType,
-    originalEvent: ProcessedEvent
-  ) => {
-    console.log("Drag Event:", dragEvent);
-    console.log("Dropped On Slot:", droppedOn);
-    console.log("Updated Event:", updatedEvent);
-    console.log("Original Event:", originalEvent);
-
-    updateAssignmentSchedule(updatedEvent, "edit");
-    await updateAssignment(updatedEvent, session);
-
-    return updatedEvent;
-  };
-
-  const handleOnDelete = async (eventId: number) => {
-    console.log("Delete event with id:", eventId);
-
-    updateAssignmentSchedule(eventId, "delete");
-    await deleteAssignment(eventId, session);
-    return eventId;
-  };
-
-  const handleSyllabusUpdate = async (
-    syllabus_id: number,
-    newTitle: FormDataEntryValue,
-    session: Session | null
-  ) => {
-    const updatedSyllabus = await updateSyllabus(
-      syllabus_id,
-      newTitle,
-      session
-    );
-    setSyllabi(
-      syllabi.map((syllabus) =>
-        syllabus.id === updatedSyllabus[0].id ? updatedSyllabus[0] : syllabus
-      )
-    );
-  };
-
-  const handleSyllabusDelete = async (syllabusId: number) => {
-    console.log("deleting syllabus with id", syllabusId);
-
-    setSyllabi(syllabi.filter((syllabus) => syllabus.id != syllabusId));
-    setAssignmentSchedule(
-      assignmentSchedule.filter(
-        (assignment) => assignment.syllabus_id != syllabusId
-      )
-    );
-    await deleteSyllabus(syllabusId, session);
-  };
+  const updateAssignmentSchedule = useCallback(
+    (
+      action: string,
+      id?: number,
+      title?: string,
+      subtitle?: string,
+      start?: string,
+      end?: string,
+      syllabusId?: number,
+      event_id?: string
+    ) => {
+      setAssignmentSchedule((prev) => {
+        if (action === "edit") {
+          return prev.map((assignment) =>
+            assignment.id === id
+              ? {
+                  ...assignment,
+                  title: title!,
+                  subtitle: subtitle!,
+                  start: start!,
+                  end: end!,
+                  event_id: event_id!,
+                }
+              : assignment
+          );
+        } else if (action === "delete") {
+          return prev.filter((assignment) => assignment.id != id);
+        } else if (action === "create") {
+          return [
+            ...prev,
+            {
+              id: id!,
+              syllabus_id: syllabusId!,
+              title: title!,
+              subtitle: subtitle!,
+              start: start!,
+              end: end!,
+              event_id: event_id!,
+            },
+          ];
+        }
+        return prev;
+      });
+    },
+    [setAssignmentSchedule]
+  );
 
   useEffect(() => {
     if (!session) return;
@@ -206,72 +143,187 @@ const CalendarSchedule = () => {
       selectedSyllabi.includes(task.syllabus_id)
     );
     return (
-      <div
-        ref={calendarContainerRef}
-        className="flex h-full p-6 border-1 border-[#252322] bg-[#171514] rounded-xl"
-      >
-        <div className="flex flex-col h-full w-full">
-          <div className="flex">
-            <div className="flex-2 bg-slate-700 overflow-hidden rounded-xl">
-              <Scheduler
-                events={filteredTasks}
-                view="month"
-                height={430}
-                onConfirm={handleOnConfirm}
-                onEventDrop={handleOnEventDrop}
-                onDelete={handleOnDelete}
-              />
-            </div>
-            <div className="flex flex-col h-full flex-1 bg-[#1c1a19] border-1 border-[#252322] rounded-xl ml-6 p-4">
-              <h2 className="text-xl text-white font-Georgia font-semibold">
-                Syllabus
-              </h2>
-              <hr className="text-[#292726] mx-6 my-5"></hr>
-              {syllabi.map((syllabus) => (
-                <div className="text-white font-Geist mb-2" key={syllabus.id}>
-                  <div className="flex justify-between gap-2">
-                    <div className="flex gap-2 items-start">
-                      <input
-                        className="mt-1"
-                        type="checkbox"
-                        defaultChecked
-                        onChange={() => toggleSelectedSyllabi(syllabus.id)}
-                      ></input>
-                      <p>{syllabus.title}</p>
-                    </div>
-                    <FontAwesomeIcon className="mt-0.5" icon={faEllipsis} />
-                  </div>
-                  {/* <button onClick={() => toggleSelectedSyllabi(syllabus.id)}>
-                    {syllabus.id} {syllabus.title}
-                  </button>
-                  <form
-                    onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-                      e.preventDefault();
-                      const formData = new FormData(e.currentTarget);
-                      const title = formData.get("title");
-                      console.log("new title", title);
-                      console.log("syllabus id", syllabus.id);
-                      if (!title) {
-                        console.error("title cannot be blank");
-                        return;
-                      } else {
-                        handleSyllabusUpdate(syllabus.id, title, session);
-                      }
-                    }}
-                  >
-                    <label>edit</label>
-                    <input name="title" type="text"></input>
-                    <button type="submit">submit</button>
-                  </form>
-                  <button onClick={() => handleSyllabusDelete(syllabus.id)}>
-                    delete
-                  </button> */}
-                </div>
-              ))}
+      <>
+        <div
+          className={`${
+            showDelete ? "z-100" : "-z-10"
+          } absolute flex inset-0 justify-center items-center w-screen h-screen backdrop-blur-xl bg-black/40`}
+        >
+          <div
+            className={`flex flex-col w-xl absolute transition duration-300 ease-out 
+            ${
+              showDelete
+                ? "opacity-100 -translate-y-15"
+                : "opacity-0 translate-y-10"
+            }`}
+          >
+            <div className="flex flex-col text-white !font-Geist relative p-4 bg-[#171514] border-1 border-[#252322] rounded-xl">
+              <h1 className="font-semibold text-2xl self-center">
+                Confirm Deletion
+              </h1>
+              <hr className="text-[#292726] my-5 mx-4"></hr>
+              <p className="mb-6 self-center">
+                Are you sure you want to delete this syllabus?
+              </p>
+              <div className="flex justify-around">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDelete(!showDelete);
+                  }}
+                  className="hover:cursor-pointer hover:bg-[#32323280] transition-all duration-300 ease-out py-1 px-2 rounded-lg"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={async () => {
+                    const removedSyllabus = syllabi.find(
+                      (syl) => syl.id === syllabusToDelete
+                    );
+
+                    setSyllabi(
+                      syllabi.filter((syl) => syl.id != syllabusToDelete)
+                    );
+                    setAssignmentSchedule(
+                      assignmentSchedule.filter(
+                        (assignment) =>
+                          assignment.syllabus_id != syllabusToDelete
+                      )
+                    );
+
+                    await deleteSyllabus(
+                      removedSyllabus?.calendar_id,
+                      removedSyllabus?.class_id,
+                      session!.user.id,
+                      syllabusToDelete!,
+                      session
+                    );
+
+                    setShowDelete(!showDelete);
+                  }}
+                  className="hover:cursor-pointer hover:bg-[#32323280] text-red-600 transition-all duration-300 ease-out py-1 px-2 rounded-lg"
+                >
+                  Confirm
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+
+        <div
+          ref={calendarContainerRef}
+          className="flex h-full border-1 p-6 border-[#252322] bg-[#171514] rounded-xl"
+        >
+          <div className="flex flex-col h-full w-full">
+            <div className="flex h-full">
+              <div className="flex-2 h-full ">
+                <FullCalendarTasksDisplay
+                  filteredTasks={filteredTasks}
+                  height={heightPx}
+                  session={session}
+                  updateAssignmentSchedule={updateAssignmentSchedule}
+                  syllabi={syllabi}
+                ></FullCalendarTasksDisplay>
+              </div>
+              <div className="flex flex-col flex-1 bg-[#1c1a19] border-1 border-[#252322] rounded-xl ml-6 p-4">
+                <h2 className="text-xl text-white font-Geist font-semibold">
+                  Syllabus
+                </h2>
+                <hr className="text-[#292726] mx-6 mt-5 mb-3"></hr>
+                {syllabi.map((syllabus) => {
+                  const isEditing = editingSyllabus.includes(syllabus.id);
+                  return (
+                    <div
+                      className="text-white font-Geist mb-2"
+                      key={syllabus.id}
+                    >
+                      <div className="flex justify-between gap-2">
+                        <div className="flex gap-2 items-start">
+                          <input
+                            className="mt-[0.8rem]"
+                            style={{ accentColor: syllabus.color }}
+                            type="checkbox"
+                            defaultChecked
+                            onChange={() => toggleSelectedSyllabi(syllabus.id)}
+                          ></input>
+                          {isEditing ? (
+                            <input
+                              className="bg-[#171514] p-2 border-1 border-[#252322] rounded-lg focus:outline-none"
+                              value={tempSyllabusTitle}
+                              onChange={(e) =>
+                                setTempSyllabusTitle(e.target.value)
+                              }
+                            ></input>
+                          ) : (
+                            <p className="py-2">{syllabus.title}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-1 mt-2 items-start">
+                          {isEditing ? (
+                            <button
+                              onClick={async () => {
+                                const updatedSyllabus = await updateSyllabus(
+                                  syllabus.calendar_id,
+                                  syllabus.id,
+                                  session!.user.id,
+                                  tempSyllabusTitle,
+                                  session
+                                );
+                                setSyllabi(
+                                  syllabi.map((syllabus) =>
+                                    syllabus.id === updatedSyllabus[0].id
+                                      ? updatedSyllabus[0]
+                                      : syllabus
+                                  )
+                                );
+                                setEditingSyllabus((prev) =>
+                                  prev.includes(syllabus.id)
+                                    ? prev.filter((sid) => sid !== syllabus.id)
+                                    : [...prev, syllabus.id]
+                                );
+                              }}
+                              className="hover:cursor-pointer"
+                            >
+                              <FontAwesomeIcon icon={faFloppyDisk} />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setTempSyllabusTitle(syllabus.title);
+                                setEditingSyllabus((prev) =>
+                                  prev.includes(syllabus.id)
+                                    ? prev.filter((sid) => sid !== syllabus.id)
+                                    : [...prev, syllabus.id]
+                                );
+                              }}
+                              className="hover:cursor-pointer"
+                            >
+                              <FontAwesomeIcon
+                                className=""
+                                icon={faPenToSquare}
+                              />
+                            </button>
+                          )}
+
+                          <button
+                            onClick={async () => {
+                              setSyllabusToDelete(syllabus.id);
+                              setShowDelete(!showDelete);
+                            }}
+                            className="hover:cursor-pointer"
+                          >
+                            <FontAwesomeIcon className="" icon={faTrashCan} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 };

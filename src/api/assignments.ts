@@ -1,27 +1,16 @@
-import type { ProcessedEvent } from "@aldabil/react-scheduler/types";
 import type { Session } from "@supabase/supabase-js";
 import axios from "axios";
-
-interface AssignmentType {
-  syllabus_id: number;
-  user_id: string;
-  id: number;
-  title: string;
-  subtitle: string;
-  deadline: Date;
-  start: Date;
-  end: Date;
-  created_at: Date;
-}
+import type { AssignmentType } from "../types";
 
 const formatAssignmentSchedule = (assignments: AssignmentType[]) => {
   return assignments.map((assignment) => ({
-    event_id: assignment.id,
+    id: assignment.id,
     syllabus_id: assignment.syllabus_id,
     title: assignment.title,
     subtitle: assignment.subtitle,
-    start: new Date(assignment.start),
-    end: new Date(assignment.end),
+    start: assignment.start,
+    end: assignment.end,
+    event_id: assignment.event_id,
   }));
 };
 
@@ -41,13 +30,19 @@ export const getAssignments = async (session: Session | null) => {
 };
 
 export const createAssignment = async (
-  event: ProcessedEvent,
+  calendar_id: string | null = null,
+  user_id: string,
+  syllabus_id: string,
+  title: string,
+  subtitle: string,
+  start: string,
+  end: string,
   session: Session | null
 ) => {
   try {
     const response = await axios.post(
       "http://localhost:4000/createAssignment",
-      event,
+      { calendar_id, user_id, syllabus_id, title, subtitle, start, end },
       {
         headers: {
           "Content-Type": "application/json",
@@ -55,20 +50,27 @@ export const createAssignment = async (
         },
       }
     );
-    console.log("Create assignment response:", response);
+    return response.data;
   } catch (error) {
     console.error("Error creating assignment:", error);
   }
 };
 
 export const updateAssignment = async (
-  event: ProcessedEvent,
+  event_id: string | null = null,
+  calendar_id: string | null = null,
+  user_id: string,
+  assignment_id: string,
+  title: string,
+  subtitle: string,
+  start: string,
+  end: string,
   session: Session | null
 ) => {
   try {
     const response = await axios.put(
-      `http://localhost:4000/updateAssignment/${event.event_id}`,
-      event,
+      `http://localhost:4000/updateAssignment/${assignment_id}`,
+      { event_id, calendar_id, user_id, title, subtitle, start, end },
       {
         headers: {
           "Content-Type": "application/json",
@@ -76,26 +78,34 @@ export const updateAssignment = async (
         },
       }
     );
-    console.log("Update response:", response.data);
+    return response.data;
   } catch (err) {
-    console.error("Error uploading PDF:", err);
+    console.error("Error updating assignment:", err);
   }
 };
 
 export const deleteAssignment = async (
-  eventId: number,
+  event_id: string | null = null,
+  calendar_id: string | null = null,
+  user_id: string,
+  assignment_id: number,
   session: Session | null
 ) => {
   try {
     const response = await axios.delete(
-      `http://localhost:4000/deleteAssignment/${eventId}`,
+      `http://localhost:4000/deleteAssignment/${assignment_id}`,
       {
+        data: {
+          event_id,
+          calendar_id,
+          user_id,
+        },
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
         },
       }
     );
-    console.log("Delete response:", response.data);
+    return response.data;
   } catch (err) {
     console.log("Error deleting assignment:", err);
   }

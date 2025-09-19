@@ -4,7 +4,7 @@ import validator from "validator";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "sonner";
-import type { ResponseType } from "../context/AuthContext";
+import type { ResponseType } from "../types";
 
 const passwordValidator = (password: string) => {
   if (
@@ -41,7 +41,6 @@ const AuthForm = ({
       onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const response = await signAction(email, password);
-        console.log("RESPONSE IS:", response);
         if (!signIn && response.success) {
           toast.success(
             "Successfully created a new user! Check your email for confirmation"

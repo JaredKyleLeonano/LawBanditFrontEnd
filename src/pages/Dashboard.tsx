@@ -1,5 +1,5 @@
 import { useNavigate, Outlet } from "react-router-dom";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -19,6 +19,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { createClass, getClasses } from "../api/classes";
 import type { Session } from "@supabase/supabase-js";
+import { deleteTokens } from "../api/google";
 import { useClasses } from "../context/classesContext";
 
 function App() {
@@ -32,8 +33,9 @@ function App() {
   const { classes, setClasses } = useClasses();
 
   useEffect(() => {
-    if (!session) console.log("testing");
-    else {
+    if (!session) {
+      console.log("testing");
+    } else {
       const retrieveClasses = async (session: Session | null) => {
         try {
           console.log("SESSION IS:", session?.user.app_metadata.provider);
@@ -43,7 +45,7 @@ function App() {
           console.error("Error retrieving classes:", err);
         }
       };
-
+      console.log("THESE ARE THE CLASSES:", classes);
       retrieveClasses(session);
     }
   }, [session, navigate]);
@@ -109,6 +111,7 @@ function App() {
                 return;
               } else {
                 await createClass(title, session);
+                // setClasses(prev => {...prev, title})
               }
             }}
             className="flex flex-col border-1 border-[#373534] bg-[#2b2827] rounded-3xl p-14"
@@ -235,7 +238,15 @@ function App() {
                   Settings
                 </li>
                 <hr className="text-[#e7e3e0]"></hr>
-                <li onClick={signOut} className="text-red-600 rounded-b-lg">
+                <li
+                  onClick={async () => {
+                    if (session.user.app_metadata.provider! == "google") {
+                      await deleteTokens(session.user.id, session);
+                    }
+                    signOut();
+                  }}
+                  className="text-red-600 rounded-b-lg"
+                >
                   <FontAwesomeIcon
                     className="mr-3"
                     icon={faArrowRightFromBracket}

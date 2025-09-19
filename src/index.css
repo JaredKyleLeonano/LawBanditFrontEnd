@@ -9,3 +9,144 @@
   --font-Georgia: Georgia, "Times New Roman", serif;
   --font-Geist: "Geist";
 }
+
+:root {
+  --font-Geist: "Geist";
+}
+
+.fc {
+  height: 100% !important;
+}
+
+.fc-header-toolbar {
+  height: 2rem;
+  padding: 0.5rem !important;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #1c1a19;
+  border-radius: 12px 12px 0 0;
+  border-color: white;
+  border: 12px;
+}
+
+.fc-prev-button,
+.fc-next-button {
+  color: gray !important;
+  background: none !important;
+  border-radius: 100% !important;
+  padding: 0px !important;
+  color: white;
+  height: 2rem !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  border: none !important;
+}
+
+.fc-button {
+  transition: background-color 200ms ease-out;
+  border: none !important;
+}
+
+.fc-button:hover {
+  background-color: rgba(50, 50, 50, 0.5) !important;
+}
+
+.fc-button:active {
+  border: none !important;
+}
+
+.fc-button:focus,
+.fc-button:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.fc-today-button:focus,
+.fc-listWeek-button:focus,
+.fc-dayGridMonth-button:focus,
+.fc-timeGridWeek-button:focus,
+.fc-timeGridDay-button:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  background-color: rgba(50, 50, 50, 0.5) !important;
+}
+
+.fc-icon {
+  font-size: 1.25rem !important;
+}
+
+.fc-toolbar-chunk {
+  display: flex;
+  align-items: center;
+}
+
+.fc-button-group {
+  gap: 0.5rem;
+}
+
+.fc-button-primary {
+  padding: 0px !important;
+}
+
+.fc-toolbar-title {
+  text-align: center;
+  width: 13rem !important;
+  font-size: 1rem !important;
+  display: inline-block !important;
+  color: #fff !important;
+  font-family: var(--font-Geist) !important;
+}
+
+.fc-today-button,
+.fc-listWeek-button,
+.fc-dayGridMonth-button,
+.fc-timeGridWeek-button,
+.fc-timeGridDay-button {
+  color: #fff !important;
+  background: none !important;
+  text-transform: uppercase !important;
+  font-size: 1rem;
+  font-family: var(--font-Geist) !important;
+  opacity: 100 !important;
+  padding: 2px 4px !important;
+  border-radius: 0.5rem !important;
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border-color: rgba(100, 116, 139, 0.3) !important;
+}
+
+.fc-theme-standard .fc-scrollgrid {
+  border-color: rgba(100, 116, 139, 0.3) !important;
+}
+
+.tippy-box {
+  pointer-events: auto !important;
+}
+
+.fc-timeGridDay-button {
+  margin-right: 0.5rem !important;
+}
+
+.fc-popover {
+  background-color: #171514 !important;
+  border-radius: 12px;
+  font-family: var(--font-Geist);
+}
+
+.fc-popover-header {
+  background-color: #1c1a19 !important;
+  border-radius: 12px 12px 0px 0px !important;
+  border-color: #fff !important;
+}
+
+.fc-day-today {
+  background-color: #2d2d2d !important;
+}

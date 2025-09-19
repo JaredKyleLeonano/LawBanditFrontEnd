@@ -5,7 +5,6 @@ const NoteCard = ({
   title: string;
   timeStamp: string;
 }) => {
-  // w-78 h-46
   return (
     <div className="flex flex-col relative justify-center items-center w-full h-full bg-white rounded-xl transition-transform duration-300 ease-out hover:-translate-y-2 hover:cursor-pointer">
       <p className="absolute top-5 left-5 text-sm font-medium py-1.5 px-3.5 bg-[#e2e0de] rounded-md">

@@ -6,15 +6,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileArrowUp } from "@fortawesome/free-solid-svg-icons";
 
 const UploadPdf = ({ classId }: { classId: string }) => {
-  const { session } = useAuth();
+  const auth = useAuth();
+  const session = auth?.session;
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       const formData = new FormData();
       formData.append("pdf", acceptedFiles[0]);
       formData.append("classId", classId);
+      formData.append("user_id", session!.user.id);
 
-      await uploadSyllabus(formData, session);
+      if (session!.user.app_metadata.provider == "google")
+        formData.append("isGoogle", "true");
+      else formData.append("isGoogle", "false");
+
+      await uploadSyllabus(formData, session!);
     },
     [session, classId]
   );

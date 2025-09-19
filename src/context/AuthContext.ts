@@ -1,39 +1,23 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import type { ReactNode } from "react";
+
 import { supabase } from "../supabaseClient";
 import { AuthError } from "@supabase/supabase-js";
-import { useNavigate } from "react-router-dom";
-import type { Session, User } from "@supabase/supabase-js";
-
-interface AuthContextType {
-  session: Session | null;
-  signUp: (email: string, password: string) => Promise<ResponseType>;
-  signOut: () => void; // expose the setter
-  signIn: (email: string, password: string) => Promise<ResponseType>;
-  signInOAuth: () => void; // expose the setter
-}
-
-export interface ResponseType {
-  success: boolean;
-  data: DataType | null;
-  error: AuthError | null;
-}
-
-interface DataType {
-  user: User | null;
-  session: Session | null;
-}
+import type { Session } from "@supabase/supabase-js";
+import { saveTokens } from "../api/google";
+import { useRef } from "react";
+import type {
+  AuthContextType,
+  ResponseType,
+  AuthProviderProps,
+} from "../types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
 
 export const AuthContextProvider: React.FC<AuthProviderProps> = ({
   children,
 }) => {
   const [session, setSession] = useState<Session | null>(null);
+  const hasSavedTokens = useRef(false);
 
   useEffect(() => {
     supabase.auth
@@ -50,6 +34,24 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (session?.user && session.provider_token && !hasSavedTokens.current) {
+      hasSavedTokens.current = true;
+      const retrieveTokens = async () => {
+        await saveTokens(
+          session.user.id,
+          session.user.app_metadata.provider!,
+          session.provider_token!,
+          session.provider_refresh_token!,
+          session.expires_at!,
+          session.expires_in,
+          session
+        );
+      };
+      retrieveTokens();
+    }
+  }, [session]);
 
   const signUp = async (
     email: string,
@@ -97,8 +99,16 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
+        options: {
+          scopes: "https://www.googleapis.com/auth/calendar",
+          queryParams: {
+            access_type: "offline", // ask Google to return a refresh token
+            prompt: "consent", // force consent screen so refresh_token is issued
+          },
+        },
       });
       if (error) throw error;
+
       return { success: true, data };
     } catch (error) {
       console.error("Error signing in:", error);
@@ -115,10 +125,9 @@ export const AuthContextProvider: React.FC<AuthProviderProps> = ({
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  const navigate = useNavigate();
+
   if (!context) {
-    navigate("/");
-    throw new Error("useAuth must be used within AuthProvider");
+    throw new Error("useAuth must be used within an AuthContextProvider");
   }
   return context;
 };

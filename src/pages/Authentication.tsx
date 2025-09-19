@@ -9,13 +9,11 @@ function Authentication() {
 
   useEffect(() => {
     if (session) {
-      console.log("SESSION EXISTS", session);
       navigate("/dashboard");
     }
   }, [session, navigate]);
 
   if (!session) {
-    console.log("NO SESSION", session);
     return (
       <>
         <Toaster

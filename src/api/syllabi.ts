@@ -16,7 +16,7 @@ export const uploadSyllabus = async (
         },
       }
     );
-    console.log("Upload syllabus response:", response.data);
+    return response.data;
   } catch (err) {
     console.error("Error uploading PDF:", err);
   }
@@ -29,7 +29,6 @@ export const getSyllabi = async (session: Session | null) => {
         Authorization: `Bearer ${session?.access_token}`,
       },
     });
-    console.log("Retrieve syllabi response:", response.data);
     return response.data;
   } catch (err) {
     console.error("Error uploading PDF:", err);
@@ -37,14 +36,16 @@ export const getSyllabi = async (session: Session | null) => {
 };
 
 export const updateSyllabus = async (
+  calendar_id: string | null = null,
   syllabus_id: number,
-  title: FormDataEntryValue,
+  user_id: string,
+  title: string,
   session: Session | null
 ) => {
   try {
     const response = await axios.put(
       `http://localhost:4000/updateSyllabus/${syllabus_id}`,
-      { syllabus_title: title },
+      { calendar_id, user_id, syllabus_title: title },
       {
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +53,6 @@ export const updateSyllabus = async (
         },
       }
     );
-    console.log("Update response:", response.data);
     return response.data;
   } catch (err) {
     console.error("Error updating Syllabus Title:", err);
@@ -60,6 +60,9 @@ export const updateSyllabus = async (
 };
 
 export const deleteSyllabus = async (
+  calendar_id: string | null = null,
+  class_id: string | undefined,
+  user_id: string,
   syllabus_id: number,
   session: Session | null
 ) => {
@@ -67,12 +70,17 @@ export const deleteSyllabus = async (
     const response = await axios.delete(
       `http://localhost:4000/deleteSyllabus/${syllabus_id}`,
       {
+        data: {
+          calendar_id,
+          class_id,
+          user_id,
+        },
         headers: {
           Authorization: `Bearer ${session?.access_token}`,
         },
       }
     );
-    console.log("Delete Syllabus response:", response.data);
+    return response.data;
   } catch (err) {
     console.log("Error deleting syllabus:", err);
   }
