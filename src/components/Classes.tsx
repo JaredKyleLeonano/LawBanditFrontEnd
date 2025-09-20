@@ -15,6 +15,7 @@ import {
 } from "@fortawesome/free-regular-svg-icons";
 
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { deleteClass, updateClass } from "../api/classes";
 import { useAuth } from "../context/AuthContext";
 import { useClasses } from "../context/ClassesContext";
@@ -32,6 +33,8 @@ const Classes = () => {
   const [showClassSettings, setShowClassSettings] = useState(false);
   const [showUploadSyllabus, setShowUploadSyllabus] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     setTitle(state.cls.title);
@@ -70,7 +73,12 @@ const Classes = () => {
             </button>
           </div>
           <div className="flex flex-col border-1 border-[#373534] bg-[#2b2827] rounded-3xl">
-            <UploadPdf classId={state.cls.id}></UploadPdf>
+            <UploadPdf
+              classId={state.cls.id}
+              onUploadComplete={() =>
+                setShowUploadSyllabus(!showUploadSyllabus)
+              }
+            ></UploadPdf>
           </div>
         </div>
       </div>
@@ -119,6 +127,7 @@ const Classes = () => {
               <button
                 onClick={async () => {
                   await deleteClass(state.cls.id, session);
+                  navigate("../home", { replace: true });
                 }}
                 className="px-4 py-2 bg-[#ef4444] rounded-lg hover:cursor-pointer"
               >

@@ -1,16 +1,24 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { uploadSyllabus } from "../api/syllabi";
 import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileArrowUp } from "@fortawesome/free-solid-svg-icons";
 
-const UploadPdf = ({ classId }: { classId: string }) => {
+const UploadPdf = ({
+  classId,
+  onUploadComplete,
+}: {
+  classId: string;
+  onUploadComplete: () => void;
+}) => {
+  const [uploading, setUploading] = useState(false);
   const auth = useAuth();
   const session = auth?.session;
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
+      setUploading(true);
       const formData = new FormData();
       formData.append("pdf", acceptedFiles[0]);
       formData.append("classId", classId);
@@ -21,8 +29,11 @@ const UploadPdf = ({ classId }: { classId: string }) => {
       else formData.append("isGoogle", "false");
 
       await uploadSyllabus(formData, session!);
+      console.log("COMPLETED");
+      setUploading(false);
+      onUploadComplete?.();
     },
-    [session, classId]
+    [session, classId, onUploadComplete]
   );
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -34,7 +45,9 @@ const UploadPdf = ({ classId }: { classId: string }) => {
 
   return (
     <div
-      className="p-14 m-2 border-2 border-dotted rounded-3xl text-[#c0bfbf] hover:cursor-pointer"
+      className={`p-14 m-2 border-2 border-dotted rounded-3xl text-[#c0bfbf] ${
+        uploading ? "hover:cursor-not-allowed" : "hover:cursor-pointer"
+      }`}
       {...getRootProps()}
     >
       <input {...getInputProps()} />

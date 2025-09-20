@@ -107,7 +107,7 @@ function App() {
                 return;
               } else {
                 await createClass(title, session);
-                // setClasses(prev => {...prev, title})
+                addClassToggleAnimation();
               }
             }}
             className="flex flex-col border-1 border-[#373534] bg-[#2b2827] rounded-3xl p-14"
