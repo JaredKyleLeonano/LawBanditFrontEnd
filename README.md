@@ -154,12 +154,6 @@ This approach allows the project to grow with additional features (e.g., more no
 
 ---
 
-## License
-
-MIT
-
----
-
 ## Acknowledgements
 
 - [Supabase](https://supabase.com/)
