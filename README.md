@@ -1,5 +1,3 @@
-Workspace: Collecting workspace information# LawBanditFrontEnd
-
 A modern web application for law students to manage classes, syllabi, assignments, and notes. Built with **React**, **TypeScript**, **Vite**, **Supabase**, and **TailwindCSS**.
 
 ---
@@ -126,6 +124,33 @@ public/
 2. Create a feature branch (`git checkout -b feature/your-feature`)
 3. Commit your changes
 4. Push and open a Pull Request
+
+---
+
+## Approach
+
+The design of **LawBanditFrontEnd** follows a **modular and context-driven architecture** to balance scalability, maintainability, and ease of contribution.
+
+- **Separation of Concerns**  
+  - API interactions are isolated in the `api/` directory, keeping data-fetching logic separate from UI.  
+  - Context providers (`AuthContext`, `ClassesContext`) manage global state, reducing prop drilling.  
+
+- **Supabase Integration**  
+  - Authentication (email/password + Google OAuth) is handled through Supabase Auth.  
+  - Database access and real-time features rely on Supabase APIs, allowing the backend to stay lightweight.  
+
+- **UI & State Management**  
+  - Built with **React** and **TypeScript** for strong typing and predictable components.  
+  - State is shared across components via React Context instead of heavy libraries like Redux.  
+
+- **Scalability & Extensibility**  
+  - Pages (`pages/`) map cleanly to routes.    
+  - Features such as **syllabus upload, class management, and assignment calendar** are implemented as independent modules, making it easier to expand functionality.  
+
+- **Developer Experience**  
+  - Overall this project was fun and challenging. I am aware of the many things I could do better especially in optimization and in terms of frontend, but given the time constraint this is the best that I could do. Please give me insights on how to improve as a developer whatever the outcome of this interview process may be.
+
+This approach allows the project to grow with additional features (e.g., more note management tools, integrations, or analytics) without major refactors.
 
 ---
 
