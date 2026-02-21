@@ -1,21 +1,14 @@
-import { useNavigate, Outlet, Form } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faHouse,
-  faCirclePlay,
-  faUser,
-} from "@fortawesome/free-regular-svg-icons";
+import { faHouse, faUser } from "@fortawesome/free-regular-svg-icons";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import {
   faBorderAll,
-  faShareNodes,
-  faGraduationCap,
   faEllipsisVertical,
   faArrowRightFromBracket,
   faXmark,
-  faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import { createClass, getClasses } from "../api/classes";
 import type { Session } from "@supabase/supabase-js";
