@@ -147,7 +147,7 @@ function App() {
         className="w-20 h-20 ml-5 mb-1"
       ></img>
       <div className="flex h-full ">
-        <nav className="flex flex-col h-full border-r-1 border-[#292726] py-4">
+        <nav className="flex flex-col h-full min-w-60 border-r-1 border-[#292726] py-4">
           <ul className="text-[#95a3af] [&_li]:px-6 [&_li]:py-3 [&_li]:duration-200 [&_li]:transition [&_li]:ease-out">
             <div className="relative z-30 bg-[#171514]">
               <li
