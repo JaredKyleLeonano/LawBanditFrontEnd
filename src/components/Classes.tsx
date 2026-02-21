@@ -170,12 +170,12 @@ const Classes = () => {
                       const response = await updateClass(
                         state.cls.id,
                         tempTitle,
-                        session
+                        session,
                       );
                       setClasses(
                         classes.map((cls) =>
-                          cls.id === state.cls.id ? response[0] : cls
-                        )
+                          cls.id === state.cls.id ? response[0] : cls,
+                        ),
                       );
                     }
 
@@ -223,13 +223,16 @@ const Classes = () => {
                 onClick={() =>
                   setShowDeleteConfirmation(!showDeleteConfirmation)
                 }
-                className="!border-0 flex items-center gap-3 w-full hover:bg-[#1c1a19] hover:cursor-pointer duration-200 transition ease-out"
+                className="group !border-0 flex items-center gap-3 w-full hover:bg-[#1c1a19] hover:cursor-pointer duration-200 transition ease-out"
               >
-                <FontAwesomeIcon className="text-xs" icon={faTrashCan} />
+                <FontAwesomeIcon
+                  className="text-xs group-hover:text-red-500 transition-colors duration-200 ease-out"
+                  icon={faTrashCan}
+                />
                 <p>Delete Class</p>
               </button>
             </div>
-            <button className="hover:bg-[#1c1a19] hover:cursor-pointer">
+            <button className="hover:bg-[#1c1a19] hover:cursor-not-allowed">
               <FontAwesomeIcon className="mr-2" icon={faBookOpen} />
               Study Room
             </button>
@@ -245,7 +248,7 @@ const Classes = () => {
       </div>
       <hr className="text-[#292726]"></hr>
       <div className="flex gap-6 py-8 px-32">
-        <div className="flex relative justify-center group gap-0 items-center text-white w-78 h-46 border-1 border-white rounded-xl transition-transform duration-300 ease-out hover:-translate-y-2 hover:cursor-pointer">
+        <div className="flex relative justify-center group gap-0 items-center text-white w-78 h-46 border-1 border-white rounded-xl transition-transform duration-300 ease-out hover:-translate-y-2 hover:cursor-not-allowed">
           <FontAwesomeIcon
             className="text-4xl transition-all duration-300 ease-out group-hover:mr-28"
             icon={faPlus}

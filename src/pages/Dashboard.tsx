@@ -1,4 +1,4 @@
-import { useNavigate, Outlet } from "react-router-dom";
+import { useNavigate, Outlet, Form } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,6 +21,8 @@ import { createClass, getClasses } from "../api/classes";
 import type { Session } from "@supabase/supabase-js";
 import { deleteTokens } from "../api/google";
 import { useClasses } from "../context/ClassesContext";
+import { supabase } from "../supabaseClient";
+import { Toaster } from "sonner";
 
 function App() {
   const { session, signOut } = useAuth();
@@ -31,6 +33,8 @@ function App() {
   const [showAddClassAnimation, setShowAddClassAnimation] = useState(false);
   const [classDropdown, setClassDropdown] = useState(false);
   const { classes, setClasses } = useClasses();
+  const [addNewClass, setAddNewClass] = useState(false);
+  const [email, setEmail] = useState<string | undefined>("");
 
   useEffect(() => {
     if (session) {
@@ -38,13 +42,19 @@ function App() {
         try {
           const response = await getClasses(session);
           setClasses(response?.data);
+          setAddNewClass(false);
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          console.log("USER DATA", user?.email);
+          setEmail(user?.email);
         } catch (err) {
           console.error("Error retrieving classes:", err);
         }
       };
       retrieveClasses(session);
     }
-  }, [session, navigate, setClasses]);
+  }, [session, navigate, setClasses, addNewClass]);
 
   const settingsToggleAnimation = () => {
     if (showSettings) {
@@ -66,6 +76,7 @@ function App() {
 
   return (
     <div className="w-screen h-screen bg-[#171514] pt-4 flex flex-col">
+      <Toaster position="bottom-right"></Toaster>
       <div
         className={`${
           showAddClass ? "flex" : "hidden"
@@ -99,7 +110,8 @@ function App() {
             onSubmit={async (e) => {
               e.preventDefault();
 
-              const formData = new FormData(e.currentTarget);
+              const form = e.currentTarget; // Store the reference to the form
+              const formData = new FormData(form);
               const title = formData.get("title");
 
               if (!title) {
@@ -108,6 +120,7 @@ function App() {
               } else {
                 await createClass(title, session);
                 addClassToggleAnimation();
+                form.reset();
               }
             }}
             className="flex flex-col border-1 border-[#373534] bg-[#2b2827] rounded-3xl p-14"
@@ -123,6 +136,9 @@ function App() {
             <button
               className="text-lg font-medium px-6 py-5 rounded-2xl bg-white mt-8 hover:cursor-pointer"
               type="submit"
+              onClick={() => {
+                setAddNewClass(true);
+              }}
             >
               <FontAwesomeIcon className="mr-3" icon={faPlus}></FontAwesomeIcon>
               Create Class
@@ -137,11 +153,14 @@ function App() {
         loading="lazy"
         className="w-20 h-20 ml-5 mb-1"
       ></img>
-      <div className="flex h-full [&_li]:hover:cursor-pointer">
-        <nav className="flex flex-col h-full border-r-1 border-[#292726] w-60 py-4">
-          <ul className="text-[#95a3af] [&_li]:hover:text-white [&_li]:hover:bg-[#1c1a19] [&_li]:px-6 [&_li]:py-3 [&_li]:duration-200 [&_li]:transition [&_li]:ease-out">
+      <div className="flex h-full ">
+        <nav className="flex flex-col h-full border-r-1 border-[#292726] py-4">
+          <ul className="text-[#95a3af] [&_li]:px-6 [&_li]:py-3 [&_li]:duration-200 [&_li]:transition [&_li]:ease-out">
             <div className="relative z-30 bg-[#171514]">
-              <li onClick={() => navigate("home")}>
+              <li
+                className="hover:cursor-pointer hover:text-white hover:bg-[#1c1a19]"
+                onClick={() => navigate("home")}
+              >
                 <FontAwesomeIcon
                   className="text-lg mr-3"
                   icon={faHouse}
@@ -149,6 +168,7 @@ function App() {
                 Home
               </li>
               <li
+                className="hover:cursor-pointer hover:text-white hover:bg-[#1c1a19]"
                 onClick={() => {
                   addClassToggleAnimation();
                 }}
@@ -159,39 +179,36 @@ function App() {
                 ></FontAwesomeIcon>
                 New Class
               </li>
-              <li onClick={() => setClassDropdown(!classDropdown)}>
+              <li
+                className="hover:cursor-default"
+                onClick={() => setClassDropdown(!classDropdown)}
+              >
                 <FontAwesomeIcon
                   className="text-lg mr-3"
                   icon={faBorderAll}
                 ></FontAwesomeIcon>
                 Classes
-                <FontAwesomeIcon
-                  className={`ml-18 transform transition duration-300 ${
-                    classDropdown ? "scale-y-[-1]" : "scale-y-[1]"
-                  }`}
-                  icon={faChevronDown}
-                ></FontAwesomeIcon>
               </li>
             </div>
-            <div
-              className={`${
-                classDropdown ? "max-h-32" : "max-h-0"
-              } transition-all ease-out duration-300 overflow-hidden`}
+
+            <hr className="text-[#292726] mx-6 "></hr>
+            {/* <div
+              className={`flex-[0px] overflow-y-auto transition-all ease-out duration-300 overflow-hidden`}
             >
               <ul className="text-sm px-8">
                 {classes.map((cls, index) => (
                   <li
                     key={index}
                     onClick={() => navigate("classes", { state: { cls } })}
-                    className="!px-0"
+                    className="!pl-2"
                   >
                     {cls.title}
                   </li>
                 ))}
               </ul>
-            </div>
-            <hr className="text-[#292726] mx-6 my-4"></hr>
-            <li>
+              <div className="w-3 h-3 rounded-full border-white border-t-2 mx-10 animate-spin"></div>
+            </div> */}
+            {/* <li>
               <FontAwesomeIcon
                 className="text-lg mr-3"
                 icon={faShareNodes}
@@ -211,8 +228,24 @@ function App() {
                 icon={faCirclePlay}
               ></FontAwesomeIcon>
               Subscribed
-            </li>
+            </li> */}
           </ul>
+          <div className={`flex-[0px] overflow-y-auto`}>
+            <ul className="text-sm text-[#95a3af] px-8">
+              {classes.map((cls, index) => (
+                <li
+                  key={index}
+                  onClick={() => navigate("classes", { state: { cls } })}
+                  className="hover:cursor-pointer !pl-2 py-3 hover:text-white hover:bg-[#1c1a19] duration-200 transition-all ease-out"
+                >
+                  {cls.title}
+                </li>
+              ))}
+            </ul>
+            <div
+              className={`w-3 h-3 rounded-full border-white border-t-2 mx-10 my-3 animate-spin ${addNewClass ? "block" : "hidden"}`}
+            ></div>
+          </div>
           <div className="flex flex-col mt-auto py-3 text-white">
             <div
               className={`relative mx-3 top-6 transition ${
@@ -251,26 +284,25 @@ function App() {
               </ul>
             </div>
             <hr className="text-[#292726] mx-6 mb-10"></hr>
-            <div className="flex mb-16 justify-center items-center hover:bg-[#1c1a19] mx-3 py-3 rounded-xl">
-              <div className="w-10 h-10 rounded-full bg-white mr-3 ml-1 flex items-center justify-center text-gray-800">
-                SU
+            <div className="w-full flex px-6">
+              <div className="flex mb-16 gap-4 w-full items-center hover:bg-[#1c1a19] py-3 rounded-xl">
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium">{email}</p>
+                  <p className="text-xs text-[#8b8386]">Not Subscribed</p>
+                </div>
+                <button
+                  className="hover:cursor-pointer"
+                  onClick={() => {
+                    setShowSettings(!showSettings);
+                    settingsToggleAnimation();
+                  }}
+                >
+                  <FontAwesomeIcon
+                    className="text-[#8b8386] text-xs "
+                    icon={faEllipsisVertical}
+                  ></FontAwesomeIcon>
+                </button>
               </div>
-              <div className="flex flex-col">
-                <p className="text-sm font-medium">sample user</p>
-                <p className="text-xs text-[#8b8386]">Not Subscribed</p>
-              </div>
-              <button
-                className="ml-10 mr-1 hover:cursor-pointer"
-                onClick={() => {
-                  setShowSettings(!showSettings);
-                  settingsToggleAnimation();
-                }}
-              >
-                <FontAwesomeIcon
-                  className="text-[#8b8386] text-xs "
-                  icon={faEllipsisVertical}
-                ></FontAwesomeIcon>
-              </button>
             </div>
           </div>
         </nav>

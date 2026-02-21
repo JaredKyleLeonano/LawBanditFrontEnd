@@ -4,6 +4,7 @@ import { uploadSyllabus } from "../api/syllabi";
 import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFileArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { toast } from "sonner";
 
 const UploadPdf = ({
   classId,
@@ -32,8 +33,9 @@ const UploadPdf = ({
       console.log("COMPLETED");
       setUploading(false);
       onUploadComplete?.();
+      toast.success("Syllabus uploaded successfully");
     },
-    [session, classId, onUploadComplete]
+    [session, classId, onUploadComplete],
   );
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
@@ -46,7 +48,7 @@ const UploadPdf = ({
   return (
     <div
       className={`p-14 m-2 border-2 border-dotted rounded-3xl text-[#c0bfbf] ${
-        uploading ? "hover:cursor-not-allowed" : "hover:cursor-pointer"
+        uploading ? "hover:cursor-wait" : "hover:cursor-pointer"
       }`}
       {...getRootProps()}
     >

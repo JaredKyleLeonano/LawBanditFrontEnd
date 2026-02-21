@@ -3,7 +3,8 @@ import AuthForm from "../components/AuthForm";
 import { Link } from "react-router-dom";
 
 const AuthSignIn = () => {
-  const { signIn, signInOAuth } = useAuth();
+  const { signIn } = useAuth();
+  // const { signInOAuth } = useAuth();
 
   return (
     <div className="w-120 p-10 flex flex-col justify-center bg-[#1f1e1d] border-1 border-[#2c2a29] rounded-2xl shadow-2xl">
@@ -11,7 +12,7 @@ const AuthSignIn = () => {
         Sign In
       </h1>
       <AuthForm signAction={signIn} signIn={true}></AuthForm>
-      <div className="flex items-center my-14">
+      {/* <div className="flex items-center my-14">
         <hr className="border-[#9ca3af] flex-grow"></hr>
         <p className="text-[#9ca3af] mx-6 font-Geist text-md">Or</p>
         <hr className="border-[#9ca3af] flex-grow"></hr>
@@ -28,7 +29,7 @@ const AuthSignIn = () => {
           loading="lazy"
         />
         Sign in with Google
-      </button>
+      </button> */}
       <p className="text-[#9ca3af] mt-2 font-Geist self-center">
         Don't have an account?{" "}
         <Link to={"/signUp"} className="underline">

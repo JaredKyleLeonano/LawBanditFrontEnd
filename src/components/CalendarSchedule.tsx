@@ -81,7 +81,7 @@ const CalendarSchedule = () => {
       start?: string,
       end?: string,
       syllabusId?: number,
-      event_id?: string
+      event_id?: string,
     ) => {
       setAssignmentSchedule((prev) => {
         if (action === "edit") {
@@ -95,7 +95,7 @@ const CalendarSchedule = () => {
                   end: end!,
                   event_id: event_id!,
                 }
-              : assignment
+              : assignment,
           );
         } else if (action === "delete") {
           return prev.filter((assignment) => assignment.id != id);
@@ -116,7 +116,7 @@ const CalendarSchedule = () => {
         return prev;
       });
     },
-    [setAssignmentSchedule]
+    [setAssignmentSchedule],
   );
 
   useEffect(() => {
@@ -137,10 +137,14 @@ const CalendarSchedule = () => {
   }, [session]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center w-full h-full">
+        <div className="w-18 h-18 border-t-4 border-t-gray-500 animate-spin rounded-full"></div>
+      </div>
+    );
   } else {
     const filteredTasks = assignmentSchedule.filter((task) =>
-      selectedSyllabi.includes(task.syllabus_id)
+      selectedSyllabi.includes(task.syllabus_id),
     );
     return (
       <>
@@ -178,17 +182,17 @@ const CalendarSchedule = () => {
                 <button
                   onClick={async () => {
                     const removedSyllabus = syllabi.find(
-                      (syl) => syl.id === syllabusToDelete
+                      (syl) => syl.id === syllabusToDelete,
                     );
 
                     setSyllabi(
-                      syllabi.filter((syl) => syl.id != syllabusToDelete)
+                      syllabi.filter((syl) => syl.id != syllabusToDelete),
                     );
                     setAssignmentSchedule(
                       assignmentSchedule.filter(
                         (assignment) =>
-                          assignment.syllabus_id != syllabusToDelete
-                      )
+                          assignment.syllabus_id != syllabusToDelete,
+                      ),
                     );
 
                     await deleteSyllabus(
@@ -196,7 +200,7 @@ const CalendarSchedule = () => {
                       removedSyllabus?.class_id,
                       session!.user.id,
                       syllabusToDelete!,
-                      session
+                      session,
                     );
 
                     setShowDelete(!showDelete);
@@ -267,19 +271,19 @@ const CalendarSchedule = () => {
                                   syllabus.id,
                                   session!.user.id,
                                   tempSyllabusTitle,
-                                  session
+                                  session,
                                 );
                                 setSyllabi(
                                   syllabi.map((syllabus) =>
                                     syllabus.id === updatedSyllabus[0].id
                                       ? updatedSyllabus[0]
-                                      : syllabus
-                                  )
+                                      : syllabus,
+                                  ),
                                 );
                                 setEditingSyllabus((prev) =>
                                   prev.includes(syllabus.id)
                                     ? prev.filter((sid) => sid !== syllabus.id)
-                                    : [...prev, syllabus.id]
+                                    : [...prev, syllabus.id],
                                 );
                               }}
                               className="hover:cursor-pointer"
@@ -293,7 +297,7 @@ const CalendarSchedule = () => {
                                 setEditingSyllabus((prev) =>
                                   prev.includes(syllabus.id)
                                     ? prev.filter((sid) => sid !== syllabus.id)
-                                    : [...prev, syllabus.id]
+                                    : [...prev, syllabus.id],
                                 );
                               }}
                               className="hover:cursor-pointer"
