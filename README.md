@@ -1,4 +1,4 @@
-A modern web application for law students to manage classes, syllabi, assignments, and notes. Built with **React**, **TypeScript**, **Vite**, **Supabase**, and **TailwindCSS**.
+A modern web application for law students to manage classes, syllabi, assignments, and notes. Built with **React**, **TypeScript**, **Vite**, **Supabase**, and **TailwindCSS**. Made without responsive design
 
 ---
 
